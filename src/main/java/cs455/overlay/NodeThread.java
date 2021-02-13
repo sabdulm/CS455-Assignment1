@@ -5,34 +5,34 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-public class CollatorThread extends Thread{
+public class NodeThread extends Thread{
     private DataInputStream clientDIS;
     private DataOutputStream clientDOS;
     private Socket clientSocket;
-    private Collator collator;
+    private Node node;
 
-    public CollatorThread(Socket s, DataInputStream dis, DataOutputStream dos, Collator c){
+    public NodeThread(Socket s, DataInputStream dis, DataOutputStream dos, Node n){
         this.clientSocket = s; this.clientDIS = dis; this.clientDOS = dos;
-        this.collator = c;
+        this.node = n;
     }
 
     @Override
     public void run() {
-        int type = 0;
+        int type;
         try {
             type = clientDIS.readInt();
+            System.out.println(type);
             if (type == 1){ // nodes come and register their ip and port
-                try {
-                    MessageRegister regMsg = new MessageRegister(clientDIS.readAllBytes());
-                    regMsg.printContents();
-                    collator.addNode(regMsg.hostName, regMsg.portNumber);
-                } catch (IOException e) { e.printStackTrace();}
+//                try {
+//                    MessageRegister regMsg = MessageRegister.getInstance(clientDIS.readAllBytes());
+//                    node.addNode(regMsg.hostName, regMsg.portNumber);
+//                } catch (IOException e) { e.printStackTrace();}
             } else if (type == 2) { // collator sends start signal to nodes
 
             } else if (type == 3) {  // message received from other node with number
 
             } else if(type == 4) { // received summary of messages from node
-                collator.stop();
+                node.stop();
             }
         } catch (IOException e) {
             e.printStackTrace();

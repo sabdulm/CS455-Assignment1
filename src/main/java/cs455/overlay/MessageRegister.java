@@ -5,21 +5,35 @@ import java.io.*;
 public class MessageRegister {
 
 	public static final int TYPE = 1;
-	private String hostName;
-	private int portNumber;
+	public String hostName;
+	public int portNumber;
 
 	public MessageRegister(String hostName, int portNumber){
 		this.hostName = hostName; this.portNumber = portNumber;
 	}
 
+	public MessageRegister(byte[] marshalledBytes) throws IOException{
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(marshalledBytes);
+		DataInputStream din = new DataInputStream(new BufferedInputStream(byteArrayInputStream));
+		int hostNameLength = din.readInt();
+		byte[] hostNameBytes = new byte[hostNameLength];
+		din.read(hostNameBytes);
+		String hn = new String(hostNameBytes);
+		int p = din.readInt();
+		byteArrayInputStream.close();
+		din.close();
+		this.hostName = hn; this.portNumber = p;
+	}
+
 	public byte[] getBytes() throws IOException {
+
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		DataOutputStream dout = new DataOutputStream(new BufferedOutputStream((byteArrayOutputStream)));
 
 		dout.writeInt(this.TYPE);
 		byte[] hostnameBytes = this.hostName.getBytes();
-		int hostNamelength = hostnameBytes.length;
-		dout.writeInt(hostNamelength);
+		int hostnameLength = hostnameBytes.length;
+		dout.writeInt(hostnameLength);
 		dout.write(hostnameBytes);
 		dout.writeInt(this.portNumber);
 		dout.flush();
@@ -31,17 +45,8 @@ public class MessageRegister {
 		return marshalledBytes;
 	}
 
-	public static MessageRegister getInstance(byte[] marshalledBytes) throws IOException {
-		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(marshalledBytes);
-		DataInputStream din = new DataInputStream(new BufferedInputStream(byteArrayInputStream));
-		int hostNameLength = din.readInt();
-		byte[] hostNameBytes = new byte[hostNameLength];
-		din.readFully(hostNameBytes);
-		String hostname = new String(hostNameBytes);
-		int port = din.readInt();
-		byteArrayInputStream.close();
-		din.close();
-		return new MessageRegister(hostname, port);
+	public void printContents(){
+		System.out.printf("Register %s with port %d\n", this.hostName, this.portNumber);
 	}
 
 }

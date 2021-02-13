@@ -35,11 +35,12 @@ public class Collator {
     }
 
     public void addNode(String hostname, int port){
-        nodeHosts.add(hostname);
-        nodePorts.add(port);
-        countConnectedNodes ++;
-
-        if(countConnectedNodes == numNodes){
+        this.nodeHosts.add(hostname);
+        this.nodePorts.add(port);
+        this.countConnectedNodes ++;
+        this.nodeHosts.forEach(System.out::println);
+        this.nodePorts.forEach(System.out::println);
+        if(this.countConnectedNodes == numNodes){
             //send start messages to all nodes.
         }
 
@@ -62,12 +63,12 @@ public class Collator {
                 clientHandler.start();
 
             } catch (Exception e){
-                clientSocket.close();
+                e.printStackTrace();
             }
 
         }
         serverSocket.close();
-
+        messageSummaries.forEach(System.out::println);
         System.out.println("Program ended successfully");
     }
 
