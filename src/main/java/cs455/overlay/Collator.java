@@ -12,6 +12,7 @@ public class Collator {
     final private int port;
     private ArrayList<String> nodeHosts;
     private ArrayList<Integer> nodePorts;
+    private ArrayList<String> messageSummaries;
     private int countConnectedNodes = 0;
     private boolean startedMessaging = false;
     private int numNodes;
@@ -26,6 +27,21 @@ public class Collator {
         this.numNodes = nn;
         this.numRounds = nr;
         this.numMessages = nm;
+
+    }
+
+    public void stop (){
+        this.running = false;
+    }
+
+    public void addNode(String hostname, int port){
+        nodeHosts.add(hostname);
+        nodePorts.add(port);
+        countConnectedNodes ++;
+
+        if(countConnectedNodes == numNodes){
+            //send start messages to all nodes.
+        }
 
     }
 
@@ -51,6 +67,8 @@ public class Collator {
 
         }
         serverSocket.close();
+
+        System.out.println("Program ended successfully");
     }
 
 }
