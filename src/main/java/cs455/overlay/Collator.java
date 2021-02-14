@@ -13,7 +13,7 @@ public class Collator {
     private ArrayList<String> nodeHosts;
     private ArrayList<Integer> nodePorts;
     private ArrayList<String> messageSummaries;
-    private int countConnectedNodes = 0;
+    private int numConnectedNodes = 0;
     private boolean startedMessaging = false;
     private int numNodes;
     private int numRounds;
@@ -37,11 +37,26 @@ public class Collator {
     public void addNode(String hostname, int port){
         this.nodeHosts.add(hostname);
         this.nodePorts.add(port);
-        this.countConnectedNodes ++;
-        this.nodeHosts.forEach(System.out::println);
-        this.nodePorts.forEach(System.out::println);
-        if(this.countConnectedNodes == numNodes){
-            //send start messages to all nodes.
+        this.numConnectedNodes++;
+
+        if(this.numConnectedNodes == this.numNodes){
+            //send start messages to all nodes
+            for (int i = 0; i < this.numNodes; i++) {
+                ArrayList<String> tempNodes = new ArrayList<String>(0);
+                ArrayList<Integer> tempPorts = new ArrayList<>(0);
+                String selectedNodeHN = this.nodeHosts.get(i);
+                Integer selectedNodeP = this.nodePorts.get(i);
+                for (int j = 0; j < this.numNodes; j++) {
+                    String tnhn = this.nodeHosts.get(j);
+                    Integer tnp = this.nodePorts.get(j);
+                    if(tnhn != selectedNodeHN && tnp != selectedNodeP){
+                        tempNodes.add(tnhn);
+                        tempPorts.add(tnp);
+                    }
+                }
+                MessageStartRounds startMsg = new MessageStartRounds(tempNodes, tempPorts, this.numRounds, this.numMessages, this.numConnectedNodes-1);
+
+            }
         }
 
     }
