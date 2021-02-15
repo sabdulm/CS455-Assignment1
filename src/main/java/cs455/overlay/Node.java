@@ -54,13 +54,14 @@ public class Node {
 
         System.out.printf("Summary of sent Messages\n%d messages sent\n%d sum of messages sent\n", this.totalSentMessages, this.totalSentSum);
 
-//        Socket collatorSocket = new Socket(this.collatorHostname, this.collatorPort);
-//        DataOutputStream collatorOutput = new DataOutputStream(collatorSocket.getOutputStream());
-
-
-        // tell collator done sending msgs
-//        this.stop();
-
+        Socket collatorSocket = new Socket(this.collatorHostname, this.collatorPort);
+        DataOutputStream collatorOutput = new DataOutputStream(collatorSocket.getOutputStream());
+        MessageDoneSending message = new MessageDoneSending(this.hostname, this.port);
+        byte[] marshalledMsg = message.getBytes();
+        collatorOutput.write(marshalledMsg);
+        collatorOutput.flush();
+        collatorOutput.close();
+        collatorSocket.close();
     }
 
     public void stop(){

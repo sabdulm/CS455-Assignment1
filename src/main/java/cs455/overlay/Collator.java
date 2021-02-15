@@ -19,6 +19,7 @@ public class Collator {
     private final int numRounds;
     private final int numMessages;
     private boolean running = true;
+    private int nodeDoneSending = 0;
 
     Collator(String hn, int p, int nn, int nr, int nm){
         this.hostname = hn;
@@ -73,6 +74,23 @@ public class Collator {
             }
         }
 
+    }
+
+    public void updateDoneSending() throws IOException {
+        this.nodeDoneSending++;
+        if(this.nodeDoneSending == this.numConnectedNodes){
+            System.out.println("all nodes completed sending, now asking for summaries");
+
+            for (int i = 0; i < this.numConnectedNodes; i++) {
+                Socket socket = new Socket(this.nodeHosts.get(i), this.nodePorts.get(i));
+                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+                MessageSendSummary summaryMsg = new MessageSendSummary();
+                byte[] marshalledMsg = summaryMsg.getBytes();
+                outputStream.flush();
+                outputStream.close();
+                socket.close();
+            }
+        }
     }
 
     public void runCollator() throws IOException {

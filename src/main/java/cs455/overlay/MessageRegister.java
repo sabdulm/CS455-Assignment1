@@ -28,7 +28,7 @@ public class MessageRegister {
 	public byte[] getBytes() throws IOException {
 
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		DataOutputStream dout = new DataOutputStream(new BufferedOutputStream((byteArrayOutputStream)));
+		DataOutputStream dout = new DataOutputStream(new BufferedOutputStream(byteArrayOutputStream));
 
 		dout.writeInt(MessageRegister.TYPE);
 		byte[] hostnameBytes = this.hostName.getBytes();

@@ -32,7 +32,8 @@ public class CollatorThread extends Thread{
             } else if (type == 3) {  // message received from other node with number
 
             } else if(type == 4) { // received summary of messages from node
-                collator.stop();
+                MessageDoneSending doneMsg = new MessageDoneSending(clientDIS.readAllBytes());
+                this.collator.updateDoneSending();
             }
         } catch (IOException e) {
             e.printStackTrace();
