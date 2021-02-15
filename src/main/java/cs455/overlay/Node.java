@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Node {
     private String hostname, collatorHostname;
@@ -20,10 +21,34 @@ public class Node {
 
     }
 
-    public void startSendingMessages(MessageStartRounds msg){
-        System.out.printf("%s ", this.hostname);
-        System.out.printf("%d ", this.port);
-        System.out.println("started sending msgs");
+    public void startSendingMessages(MessageStartRounds msg) throws IOException {
+        this.nodeHosts = msg.hostnames;
+        this.nodePorts = msg.ports;
+        for (int i = 0; i < msg.numRounds; i++) {
+            Random randomizer = new Random();
+            int index = randomizer.nextInt(msg.numConnectedNodes);
+            String hostname = this.nodeHosts.get(index);
+            int port = this.nodePorts.get(index);
+            for (int j = 0; j < msg.numMessages; j++) {
+                // send msgs to selected node
+                Socket socket = new Socket(hostname, port);
+                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+                MessagePayload message = new MessagePayload(i, j, randomizer.nextLong(), this.port, this.hostname);
+                byte[] marshalledMsg = message.getBytes();
+                outputStream.write(marshalledMsg);
+                outputStream.flush();
+                outputStream.close();
+                socket.close();
+            }
+        }
+
+//        Socket collatorSocket = new Socket(this.collatorHostname, this.collatorPort);
+//        DataOutputStream collatorOutput = new DataOutputStream(collatorSocket.getOutputStream());
+
+
+        // tell collator done sending msgs
+//        this.stop();
+
     }
 
     public void stop(){

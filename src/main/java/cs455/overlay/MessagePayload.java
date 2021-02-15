@@ -10,7 +10,7 @@ public class MessagePayload {
     public String hostname;
     public long payload;
 
-    public MessagePayload(int numRound, int numMessage, int payload, int port, String hostname){
+    public MessagePayload(int numRound, int numMessage, long payload, int port, String hostname){
         this.hostname = hostname; this.port = port;
         this.numRound = numRound; this.numMessage = numMessage; this.payload = payload;
     }
