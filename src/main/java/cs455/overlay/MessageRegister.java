@@ -17,7 +17,7 @@ public class MessageRegister {
 		DataInputStream din = new DataInputStream(new BufferedInputStream(byteArrayInputStream));
 		int hostNameLength = din.readInt();
 		byte[] hostNameBytes = new byte[hostNameLength];
-		din.read(hostNameBytes);
+		din.readFully(hostNameBytes);
 		String hn = new String(hostNameBytes);
 		int p = din.readInt();
 		byteArrayInputStream.close();

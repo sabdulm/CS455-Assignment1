@@ -15,6 +15,27 @@ public class MessageStartRounds {
     }
 
     public MessageStartRounds(byte[] marshalledBytes) throws IOException{
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(marshalledBytes);
+        DataInputStream din = new DataInputStream(new BufferedInputStream(byteArrayInputStream));
+
+        this.numRounds = din.readInt();
+        this.numMessages = din.readInt();
+        this.numConnectedNodes = din.readInt();
+
+        this.hostnames = new ArrayList<String>(0);
+        this.ports = new ArrayList<Integer>(0);
+        for (int i = 0; i < this.numConnectedNodes; i++) {
+            int hostNameLength = din.readInt();
+            byte[] hostNameBytes = new byte[hostNameLength];
+            din.readFully(hostNameBytes);
+            String hn = new String(hostNameBytes);
+            int p = din.readInt();
+            this.hostnames.add(hn);
+            this.ports.add(p);
+        }
+
+        byteArrayInputStream.close();
+        din.close();
     }
 
     public byte[] getBytes() throws IOException {
