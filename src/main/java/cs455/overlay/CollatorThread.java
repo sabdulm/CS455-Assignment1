@@ -24,7 +24,7 @@ public class CollatorThread extends Thread{
             if (type == 1){ // nodes come and register their ip and port
                 try {
                     MessageRegister regMsg = new MessageRegister(clientDIS.readAllBytes());
-                    regMsg.printContents();
+//                    regMsg.printContents();
                     collator.addNode(regMsg.hostName, regMsg.portNumber);
                 } catch (IOException e) { e.printStackTrace();}
             } else if (type == 2) { // collator sends start signal to nodes

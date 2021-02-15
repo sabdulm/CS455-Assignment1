@@ -20,6 +20,12 @@ public class Node {
 
     }
 
+    public void startSendingMessages(MessageStartRounds msg){
+        System.out.printf("%s ", this.hostname);
+        System.out.printf("%d ", this.port);
+        System.out.println("started sending msgs");
+    }
+
     public void stop(){
         this.running = false;
     }

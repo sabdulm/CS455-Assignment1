@@ -21,14 +21,13 @@ public class NodeThread extends Thread{
         int type;
         try {
             type = clientDIS.readInt();
-            System.out.println(type);
-            if (type == 1){ // nodes come and register their ip and port
-//                try {
-//                    MessageRegister regMsg = MessageRegister.getInstance(clientDIS.readAllBytes());
-//                    node.addNode(regMsg.hostName, regMsg.portNumber);
-//                } catch (IOException e) { e.printStackTrace();}
-            } else if (type == 2) { // collator sends start signal to nodes
 
+            if (type == 1){ // nodes come and register their ip and port
+                // not required for normal nodes
+
+            } else if (type == 2) { // collator sends start signal to nodes
+                MessageStartRounds startMsg = new MessageStartRounds(clientDIS.readAllBytes());
+                this.node.startSendingMessages(startMsg);
             } else if (type == 3) {  // message received from other node with number
 
             } else if(type == 4) { // received summary of messages from node

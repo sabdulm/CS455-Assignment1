@@ -34,7 +34,19 @@ public class Collator {
         this.running = false;
     }
 
-    public void addNode(String hostname, int port){
+    private void sendStartMessageToNode(String hostname, Integer port, MessageStartRounds message) throws IOException {
+        Socket socket = new Socket(hostname, port);
+        DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
+        byte[] marshalledMsg = message.getBytes();
+        outStream.write(marshalledMsg);
+        outStream.flush();
+        outStream.close();
+        socket.close();
+
+        return;
+    }
+
+    public void addNode(String hostname, int port) throws IOException {
         this.nodeHosts.add(hostname);
         this.nodePorts.add(port);
         this.numConnectedNodes++;
@@ -56,8 +68,11 @@ public class Collator {
                 }
                 MessageStartRounds startMsg = new MessageStartRounds(tempNodes, tempPorts, this.numRounds, this.numMessages, this.numConnectedNodes-1);
 
+                this.sendStartMessageToNode(selectedNodeHN, selectedNodeP, startMsg);
             }
         }
+
+        return;
 
     }
 
