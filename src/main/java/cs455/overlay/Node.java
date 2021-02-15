@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Node {
-    private String hostname, collatorHostname;
-    private int port, collatorPort;
-    private ArrayList<String> nodeHosts;
-    private ArrayList<Integer> nodePorts;
+    private final String hostname;
+    private final String collatorHostname;
+    private final int port;
+    private final int collatorPort;
     private boolean running = true;
 
     Node(String hn, int p, String chn, int cp){
@@ -22,13 +22,13 @@ public class Node {
     }
 
     public void startSendingMessages(MessageStartRounds msg) throws IOException {
-        this.nodeHosts = msg.hostnames;
-        this.nodePorts = msg.ports;
+        ArrayList<String> nodeHosts = msg.hostnames;
+        ArrayList<Integer> nodePorts = msg.ports;
         for (int i = 0; i < msg.numRounds; i++) {
             Random randomizer = new Random();
             int index = randomizer.nextInt(msg.numConnectedNodes);
-            String hostname = this.nodeHosts.get(index);
-            int port = this.nodePorts.get(index);
+            String hostname = nodeHosts.get(index);
+            int port = nodePorts.get(index);
             for (int j = 0; j < msg.numMessages; j++) {
                 // send msgs to selected node
                 Socket socket = new Socket(hostname, port);
@@ -68,7 +68,7 @@ public class Node {
         collatorSocket.close();
 
         while(this.running){
-            Socket clientSocket = null;
+            Socket clientSocket;
 
             try {
                 clientSocket = serverSocket.accept();

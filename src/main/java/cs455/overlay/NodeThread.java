@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class NodeThread extends Thread{
-    private DataInputStream clientDIS;
-    private DataOutputStream clientDOS;
-    private Socket clientSocket;
-    private Node node;
+    private final DataInputStream clientDIS;
+    private final DataOutputStream clientDOS;
+    private final Socket clientSocket;
+    private final Node node;
 
     public NodeThread(Socket s, DataInputStream dis, DataOutputStream dos, Node n){
         this.clientSocket = s; this.clientDIS = dis; this.clientDOS = dos;

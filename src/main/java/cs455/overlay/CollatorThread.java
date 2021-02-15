@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class CollatorThread extends Thread{
-    private DataInputStream clientDIS;
-    private DataOutputStream clientDOS;
-    private Socket clientSocket;
-    private Collator collator;
+    private final DataInputStream clientDIS;
+    private final DataOutputStream clientDOS;
+    private final Socket clientSocket;
+    private final Collator collator;
 
     public CollatorThread(Socket s, DataInputStream dis, DataOutputStream dos, Collator c){
         this.clientSocket = s; this.clientDIS = dis; this.clientDOS = dos;
@@ -18,7 +18,7 @@ public class CollatorThread extends Thread{
 
     @Override
     public void run() {
-        int type = 0;
+        int type;
         try {
             type = clientDIS.readInt();
             if (type == 1){ // nodes come and register their ip and port

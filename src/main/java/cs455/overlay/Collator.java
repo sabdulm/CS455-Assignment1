@@ -10,20 +10,21 @@ import java.util.ArrayList;
 public class Collator {
     final private String hostname;
     final private int port;
-    private ArrayList<String> nodeHosts;
-    private ArrayList<Integer> nodePorts;
+    private final ArrayList<String> nodeHosts;
+    private final ArrayList<Integer> nodePorts;
     private ArrayList<String> messageSummaries;
     private int numConnectedNodes = 0;
     private boolean startedMessaging = false;
-    private int numNodes;
-    private int numRounds;
-    private int numMessages;
+    private final int numNodes;
+    private final int numRounds;
+    private final int numMessages;
     private boolean running = true;
 
     Collator(String hn, int p, int nn, int nr, int nm){
-        this.hostname = hn; this.port = p;
-        this.nodeHosts = new ArrayList<String>(0);
-        this.nodePorts = new ArrayList<Integer>(0);
+        this.hostname = hn;
+        this.port = p;
+        this.nodeHosts = new ArrayList<>(0);
+        this.nodePorts = new ArrayList<>(0);
         this.numNodes = nn;
         this.numRounds = nr;
         this.numMessages = nm;
@@ -52,6 +53,7 @@ public class Collator {
 
         if(this.numConnectedNodes == this.numNodes){
             //send start messages to all nodes
+            this.startedMessaging = true;
             for (int i = 0; i < this.numNodes; i++) {
                 ArrayList<String> tempNodes = new ArrayList<>(0);
                 ArrayList<Integer> tempPorts = new ArrayList<>(0);
@@ -60,7 +62,7 @@ public class Collator {
                 for (int j = 0; j < this.numNodes; j++) {
                     String tnhn = this.nodeHosts.get(j);
                     Integer tnp = this.nodePorts.get(j);
-                    if(tnhn != selectedNodeHN && tnp != selectedNodeP){
+                    if(!tnhn.equals(selectedNodeHN) && !tnp.equals(selectedNodeP)){
                         tempNodes.add(tnhn);
                         tempPorts.add(tnp);
                     }
@@ -71,8 +73,6 @@ public class Collator {
             }
         }
 
-        return;
-
     }
 
     public void runCollator() throws IOException {
@@ -82,7 +82,7 @@ public class Collator {
         System.out.println("created serverSocket");
 
         while (this.running) {
-            Socket clientSocket = null;
+            Socket clientSocket;
 
             try {
                 clientSocket = serverSocket.accept();
