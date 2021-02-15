@@ -22,8 +22,8 @@ public class MessageStartRounds {
         this.numMessages = din.readInt();
         this.numConnectedNodes = din.readInt();
 
-        this.hostnames = new ArrayList<String>(0);
-        this.ports = new ArrayList<Integer>(0);
+        this.hostnames = new ArrayList<>(0);
+        this.ports = new ArrayList<>(0);
         for (int i = 0; i < this.numConnectedNodes; i++) {
             int hostNameLength = din.readInt();
             byte[] hostNameBytes = new byte[hostNameLength];
@@ -43,7 +43,7 @@ public class MessageStartRounds {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dout = new DataOutputStream(new BufferedOutputStream((byteArrayOutputStream)));
 
-        dout.writeInt(this.TYPE);
+        dout.writeInt(MessageStartRounds.TYPE);
         dout.writeInt(this.numRounds);
         dout.writeInt(this.numMessages);
         dout.writeInt(this.numConnectedNodes);
@@ -66,6 +66,9 @@ public class MessageStartRounds {
 
     public void printContents(){
         System.out.println("printing start rounds message");
+        System.out.printf("Rounds: %d, Messages: %d, Nodes: %d\n", this.numRounds, this.numMessages, this.numConnectedNodes);
+        this.hostnames.forEach(System.out::println);
+        this.ports.forEach(System.out::println);
     }
 
 }

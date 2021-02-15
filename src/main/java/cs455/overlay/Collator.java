@@ -43,7 +43,6 @@ public class Collator {
         outStream.close();
         socket.close();
 
-        return;
     }
 
     public void addNode(String hostname, int port) throws IOException {
@@ -54,7 +53,7 @@ public class Collator {
         if(this.numConnectedNodes == this.numNodes){
             //send start messages to all nodes
             for (int i = 0; i < this.numNodes; i++) {
-                ArrayList<String> tempNodes = new ArrayList<String>(0);
+                ArrayList<String> tempNodes = new ArrayList<>(0);
                 ArrayList<Integer> tempPorts = new ArrayList<>(0);
                 String selectedNodeHN = this.nodeHosts.get(i);
                 Integer selectedNodeP = this.nodePorts.get(i);

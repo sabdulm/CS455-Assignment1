@@ -30,7 +30,7 @@ public class MessageRegister {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		DataOutputStream dout = new DataOutputStream(new BufferedOutputStream((byteArrayOutputStream)));
 
-		dout.writeInt(this.TYPE);
+		dout.writeInt(MessageRegister.TYPE);
 		byte[] hostnameBytes = this.hostName.getBytes();
 		int hostnameLength = hostnameBytes.length;
 		dout.writeInt(hostnameLength);
