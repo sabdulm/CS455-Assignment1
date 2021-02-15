@@ -26,13 +26,13 @@ public class Collator {
         this.port = p;
         this.nodeHosts = new ArrayList<>(0);
         this.nodePorts = new ArrayList<>(0);
+        this.messageSummaries = new ArrayList<>(0);
         this.numNodes = nn;
         this.numRounds = nr;
         this.numMessages = nm;
-
     }
 
-    public void stop (){
+    private void stop (){
         this.running = false;
     }
 
@@ -44,7 +44,19 @@ public class Collator {
         outStream.flush();
         outStream.close();
         socket.close();
+    }
 
+    private void sendStopToNodes() throws IOException {
+
+    }
+
+    public void addSummary(String summary) throws IOException {
+        this.messageSummaries.add(summary);
+
+        if(this.messageSummaries.size() == this.numConnectedNodes) {
+            this.stop();
+            this.sendStopToNodes();
+        }
     }
 
     public void addNode(String hostname, int port) throws IOException {

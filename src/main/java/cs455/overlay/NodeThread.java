@@ -22,10 +22,8 @@ public class NodeThread extends Thread{
         try {
             type = clientDIS.readInt();
 
-            if (type == 1){ // nodes come and register their ip and port
-                // not required for normal nodes
-
-            } else if (type == 2) { // collator sends start signal to nodes
+            if (type == 2) {
+                // collator sends start signal to nodes
                 MessageStartRounds startMsg = new MessageStartRounds(clientDIS.readAllBytes());
                 this.node.startSendingMessages(startMsg);
             } else if (type == 3) {
@@ -33,8 +31,9 @@ public class NodeThread extends Thread{
                 MessagePayload payloadMsg = new MessagePayload(clientDIS.readAllBytes());
                 this.node.addReceivedSum(payloadMsg.payload);
 
-            } else if(type == 4) { // received summary of messages from node
-//                node.stop();
+            } else if(type == 5) {
+                // collator asks for summary
+                this.node.sendSummary();
             }
         } catch (IOException e) {
             e.printStackTrace();

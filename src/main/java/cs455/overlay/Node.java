@@ -28,32 +28,18 @@ public class Node {
         this.totalReceivedMessages++;
     }
 
-    public void startSendingMessages(MessageStartRounds msg) throws IOException {
-        ArrayList<String> nodeHosts = msg.hostnames;
-        ArrayList<Integer> nodePorts = msg.ports;
-        for (int i = 0; i < msg.numRounds; i++) {
-            Random randomizer = new Random();
-            int index = randomizer.nextInt(msg.numConnectedNodes);
-            String hostname = nodeHosts.get(index);
-            int port = nodePorts.get(index);
-            for (int j = 0; j < msg.numMessages; j++) {
-                // send msgs to selected node
-                Socket socket = new Socket(hostname, port);
-                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-                MessagePayload message = new MessagePayload(i, j, randomizer.nextLong(), this.port, this.hostname);
-                byte[] marshalledMsg = message.getBytes();
-                outputStream.write(marshalledMsg);
-                outputStream.flush();
-                outputStream.close();
-                socket.close();
+    private void sendMessageToNode(String hostname, int port, MessagePayload message) throws IOException {
+        Socket socket = new Socket(hostname, port);
+        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
-                this.totalSentMessages++;
-                this.totalSentSum += message.payload;
-            }
-        }
+        byte[] marshalledMsg = message.getBytes();
+        outputStream.write(marshalledMsg);
+        outputStream.flush();
+        outputStream.close();
+        socket.close();
+    }
 
-        System.out.printf("Summary of sent Messages\n%d messages sent\n%d sum of messages sent\n", this.totalSentMessages, this.totalSentSum);
-
+    private void sendCollatorDone() throws IOException {
         Socket collatorSocket = new Socket(this.collatorHostname, this.collatorPort);
         DataOutputStream collatorOutput = new DataOutputStream(collatorSocket.getOutputStream());
         MessageDoneSending message = new MessageDoneSending(this.hostname, this.port);
@@ -64,7 +50,42 @@ public class Node {
         collatorSocket.close();
     }
 
-    public void stop(){
+    public void startSendingMessages(MessageStartRounds msg) throws IOException {
+        ArrayList<String> nodeHosts = msg.hostnames;
+        ArrayList<Integer> nodePorts = msg.ports;
+        for (int i = 0; i < msg.numRounds; i++) {
+            Random randomizer = new Random();
+            int index = randomizer.nextInt(msg.numConnectedNodes);
+            String hostname = nodeHosts.get(index);
+            int port = nodePorts.get(index);
+            for (int j = 0; j < msg.numMessages; j++) {
+                // send msgs to selected node
+                MessagePayload message = new MessagePayload(i, j, randomizer.nextLong(), this.port, this.hostname);
+                this.sendMessageToNode(hostname, port, message);
+                this.totalSentMessages++;
+                this.totalSentSum += message.payload;
+            }
+        }
+
+        System.out.printf("Summary of sent Messages\n%d messages sent\n%d sum of messages sent\n", this.totalSentMessages, this.totalSentSum);
+        this.sendCollatorDone();
+
+    }
+
+    public void sendSummary() throws IOException {
+        String summary = String.format("%s,%d,%d,%d,%d,%d", this.hostname, this.port, this.totalSentMessages, this.totalReceivedMessages, this.totalSentSum, this.totalReceivedSum);
+
+        Socket collatorSocket = new Socket(this.collatorHostname, this.collatorPort);
+        DataOutputStream collatorOutput = new DataOutputStream(collatorSocket.getOutputStream());
+        MessageSummary message = new MessageSummary(summary);
+        byte[] marshalledMsg = message.getBytes();
+        collatorOutput.write(marshalledMsg);
+        collatorOutput.flush();
+        collatorOutput.close();
+        collatorSocket.close();
+    }
+
+    private void stop(){
         this.running = false;
     }
 
