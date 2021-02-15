@@ -28,9 +28,13 @@ public class NodeThread extends Thread{
             } else if (type == 2) { // collator sends start signal to nodes
                 MessageStartRounds startMsg = new MessageStartRounds(clientDIS.readAllBytes());
                 this.node.startSendingMessages(startMsg);
-            } else if (type == 3) {  // message received from other node with number
+            } else if (type == 3) {
+                // message received from other node with number
+                MessagePayload payloadMsg = new MessagePayload(clientDIS.readAllBytes());
+                this.node.addReceivedSum(payloadMsg.payload);
+
             } else if(type == 4) { // received summary of messages from node
-                node.stop();
+//                node.stop();
             }
         } catch (IOException e) {
             e.printStackTrace();

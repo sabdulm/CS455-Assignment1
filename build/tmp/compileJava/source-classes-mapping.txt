@@ -1,5 +1,9 @@
 cs455/overlay/Collator.java
  cs455.overlay.Collator
+cs455/overlay/MessageDoneSending.java
+ cs455.overlay.MessageDoneSending
+cs455/overlay/MessagePayload.java
+ cs455.overlay.MessagePayload
 cs455/overlay/MessageRegister.java
  cs455.overlay.MessageRegister
 cs455/overlay/CollatorThread.java

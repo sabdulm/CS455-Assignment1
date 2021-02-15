@@ -62,7 +62,7 @@ public class Collator {
                 for (int j = 0; j < this.numNodes; j++) {
                     String tnhn = this.nodeHosts.get(j);
                     Integer tnp = this.nodePorts.get(j);
-                    if(!tnhn.equals(selectedNodeHN) && !tnp.equals(selectedNodeP)){
+                    if(tnhn != selectedNodeHN && tnp != selectedNodeP){
                         tempNodes.add(tnhn);
                         tempPorts.add(tnp);
                     }

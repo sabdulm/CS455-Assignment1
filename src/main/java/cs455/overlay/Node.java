@@ -14,11 +14,18 @@ public class Node {
     private final int port;
     private final int collatorPort;
     private boolean running = true;
+    private long totalSentMessages, totalReceivedMessages, totalSentSum, totalReceivedSum;
+
 
     Node(String hn, int p, String chn, int cp){
         this.hostname = hn; this.port = p;
         this.collatorHostname = chn; this.collatorPort = cp;
 
+    }
+
+    public void addReceivedSum(long payload) {
+        this.totalReceivedSum += payload;
+        this.totalReceivedMessages++;
     }
 
     public void startSendingMessages(MessageStartRounds msg) throws IOException {
@@ -39,8 +46,13 @@ public class Node {
                 outputStream.flush();
                 outputStream.close();
                 socket.close();
+
+                this.totalSentMessages++;
+                this.totalSentSum += message.payload;
             }
         }
+
+        System.out.printf("Summary of sent Messages\n%d messages sent\n%d sum of messages sent\n", this.totalSentMessages, this.totalSentSum);
 
 //        Socket collatorSocket = new Socket(this.collatorHostname, this.collatorPort);
 //        DataOutputStream collatorOutput = new DataOutputStream(collatorSocket.getOutputStream());
