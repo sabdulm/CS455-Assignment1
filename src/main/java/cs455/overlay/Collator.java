@@ -54,6 +54,7 @@ public class Collator {
         this.messageSummaries.add(summary);
 
         if(this.messageSummaries.size() == this.numConnectedNodes) {
+            this.messageSummaries.forEach(System.out::println);
             this.stop();
             this.sendStopToNodes();
         }
@@ -98,6 +99,7 @@ public class Collator {
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
                 MessageSendSummary summaryMsg = new MessageSendSummary();
                 byte[] marshalledMsg = summaryMsg.getBytes();
+                outputStream.write(marshalledMsg);
                 outputStream.flush();
                 outputStream.close();
                 socket.close();
