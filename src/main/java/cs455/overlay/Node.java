@@ -20,7 +20,6 @@ public class Node {
     Node(String hn, int p, String chn, int cp){
         this.hostname = hn; this.port = p;
         this.collatorHostname = chn; this.collatorPort = cp;
-
     }
 
     public void addReceivedSum(long payload) {
@@ -83,6 +82,18 @@ public class Node {
         collatorOutput.flush();
         collatorOutput.close();
         collatorSocket.close();
+
+        this.stop();
+    }
+
+    public void resendCollatorClose(MessageClose msg) throws IOException {
+        Socket collatorSocket = new Socket(this.collatorHostname, this.collatorPort);
+        DataOutputStream collatorOutput = new DataOutputStream(collatorSocket.getOutputStream());
+        byte[] marshalledMsg = msg.getBytes();
+        collatorOutput.write(marshalledMsg);
+        collatorOutput.flush();
+        collatorOutput.close();
+        collatorSocket.close();
     }
 
     private void stop(){
@@ -114,11 +125,9 @@ public class Node {
             } catch (Exception e){
                 e.printStackTrace();
             }
-
         }
 
+        System.out.println("Node has finished processing. Shutting down.");
         serverSocket.close();
-        
-
     }
 }

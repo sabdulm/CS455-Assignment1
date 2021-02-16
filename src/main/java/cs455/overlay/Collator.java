@@ -47,14 +47,28 @@ public class Collator {
     }
 
     private void sendStopToNodes() throws IOException {
-
+        for (int i = 0; i < this.numConnectedNodes; i++) {
+            Socket socket = new Socket(this.nodeHosts.get(i), this.nodePorts.get(i));
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            MessageClose closeMsg;
+            if (i == this.numConnectedNodes-1) {
+                closeMsg = new MessageClose(true);
+            } else {
+               closeMsg = new MessageClose();
+            }
+            byte[] marshalledMsg = closeMsg.getBytes();
+            outputStream.write(marshalledMsg);
+            outputStream.flush();
+            outputStream.close();
+            socket.close();
+        }
     }
 
     public void addSummary(String summary) throws IOException {
         this.messageSummaries.add(summary);
 
         if(this.messageSummaries.size() == this.numConnectedNodes) {
-            this.messageSummaries.forEach(System.out::println);
+            System.out.println("Received all summaries, sending signal to shutdown.");
             this.stop();
             this.sendStopToNodes();
         }
@@ -129,7 +143,7 @@ public class Collator {
 
         }
         serverSocket.close();
-        messageSummaries.forEach(System.out::println);
+        this.messageSummaries.forEach(System.out::println);
         System.out.println("Program ended successfully");
     }
 

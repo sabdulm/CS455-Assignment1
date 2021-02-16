@@ -21,15 +21,22 @@ public class CollatorThread extends Thread{
         int type;
         try {
             type = clientDIS.readInt();
-            if (type == 1){ // nodes come and register their ip and port
+
+            if (type == 1){
+                // nodes come and register their ip and port
                 MessageRegister regMsg = new MessageRegister(clientDIS.readAllBytes());
                 collator.addNode(regMsg.hostName, regMsg.portNumber);
-            } else if(type == 4) { // received summary of messages from node
+            } else if(type == 4) {
+                // node sent signal it has completed its rounds.
                 MessageDoneSending doneMsg = new MessageDoneSending(clientDIS.readAllBytes());
                 this.collator.updateDoneSending();
             } else if(type == 6) {
+                // node sent summary to collator
                 MessageSummary summaryMsg = new MessageSummary(clientDIS.readAllBytes());
                 this.collator.addSummary(summaryMsg.summary);
+            } else if (type == 7) {
+                // collator receives close signal.
+                this.clientDIS.readAllBytes();
             }
         } catch (IOException e) {
             e.printStackTrace();

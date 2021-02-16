@@ -27,13 +27,18 @@ public class NodeThread extends Thread{
                 MessageStartRounds startMsg = new MessageStartRounds(clientDIS.readAllBytes());
                 this.node.startSendingMessages(startMsg);
             } else if (type == 3) {
-                // message received from other node with number
+                // message received from other node with payload
                 MessagePayload payloadMsg = new MessagePayload(clientDIS.readAllBytes());
                 this.node.addReceivedSum(payloadMsg.payload);
-
             } else if(type == 5) {
                 // collator asks for summary
                 this.node.sendSummary();
+            } else if (type == 7) {
+                //collator sends close signal;
+                MessageClose closeMsg = new MessageClose(clientDIS.readAllBytes());
+                if(closeMsg.toClose){
+                    this.node.resendCollatorClose(closeMsg);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
