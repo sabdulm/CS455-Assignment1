@@ -68,7 +68,7 @@ public class Collator {
         this.messageSummaries.add(summary);
 
         if(this.messageSummaries.size() == this.numConnectedNodes) {
-            System.out.println("Received all summaries, sending signal to shutdown.");
+            System.out.println("Collator: received all summaries, sending signal to shutdown.");
             this.stop();
             this.sendStopToNodes();
         }
@@ -81,6 +81,9 @@ public class Collator {
 
         if(this.numConnectedNodes == this.numNodes){
             //send start messages to all nodes
+
+            System.out.println("Collator: all nodes joined, sending start signal");
+
             this.startedMessaging = true;
             for (int i = 0; i < this.numNodes; i++) {
                 ArrayList<String> tempNodes = new ArrayList<>(0);
@@ -106,7 +109,7 @@ public class Collator {
     public void updateDoneSending() throws IOException {
         this.nodeDoneSending++;
         if(this.nodeDoneSending == this.numConnectedNodes){
-            System.out.println("all nodes completed sending, now asking for summaries");
+            System.out.println("Collator: all nodes completed their rounds, now asking for summaries");
 
             for (int i = 0; i < this.numConnectedNodes; i++) {
                 Socket socket = new Socket(this.nodeHosts.get(i), this.nodePorts.get(i));
@@ -121,11 +124,31 @@ public class Collator {
         }
     }
 
+    private void printSummary() {
+        long totalSentMsgs = 0, totalRecvMsgs = 0;
+        long totalSentSum = 0, totalRecvSum = 0;
+
+        for (int i = 0; i < this.messageSummaries.size(); i++) {
+            String msgSummary = this.messageSummaries.get(i);
+            String[] splitSummary =  msgSummary.split(",");
+            totalSentMsgs += Long.parseLong(splitSummary[2]);
+            totalRecvMsgs += Long.parseLong(splitSummary[3]);
+            totalSentSum += Long.parseLong(splitSummary[4]);
+            totalRecvSum += Long.parseLong(splitSummary[5]);
+        }
+
+        System.out.println("Collator: Summary of Messages");
+        System.out.println("Hostname, port, Total Sent Msgs, Total Recvd Msgs, Total Sent Summation, Total Recvd Summation");
+        this.messageSummaries.forEach(System.out::println);
+        System.out.printf("Total of summaries: %d, %d, %d, %d\n", totalSentMsgs, totalRecvMsgs, totalSentSum, totalRecvSum);
+
+    }
+
     public void runCollator() throws IOException {
         //start collator server
 
         ServerSocket serverSocket = new ServerSocket(this.port,100);
-        System.out.println("created serverSocket");
+        System.out.println("Collator: started server, waiting for connections");
 
         while (this.running) {
             Socket clientSocket;
@@ -143,8 +166,10 @@ public class Collator {
 
         }
         serverSocket.close();
-        this.messageSummaries.forEach(System.out::println);
-        System.out.println("Program ended successfully");
+
+        this.printSummary();
+
+        System.out.println("Collator: shutting down now");
     }
 
 }

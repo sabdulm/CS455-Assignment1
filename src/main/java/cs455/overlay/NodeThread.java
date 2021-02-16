@@ -29,7 +29,9 @@ public class NodeThread extends Thread{
             } else if (type == 3) {
                 // message received from other node with payload
                 MessagePayload payloadMsg = new MessagePayload(clientDIS.readAllBytes());
-                this.node.addReceivedSum(payloadMsg.payload);
+                synchronized (this.node) {
+                    this.node.addReceivedSum(payloadMsg.payload);
+                }
             } else if(type == 5) {
                 // collator asks for summary
                 this.node.sendSummary();

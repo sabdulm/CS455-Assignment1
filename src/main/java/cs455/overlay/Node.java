@@ -66,7 +66,6 @@ public class Node {
             }
         }
 
-        System.out.printf("Summary of sent Messages\n%d messages sent\n%d sum of messages sent\n", this.totalSentMessages, this.totalSentSum);
         this.sendCollatorDone();
 
     }
@@ -127,7 +126,8 @@ public class Node {
             }
         }
 
-        System.out.println("Node has finished processing. Shutting down.");
+
         serverSocket.close();
+        System.out.println("Node has finished processing. Shutting down.");
     }
 }
