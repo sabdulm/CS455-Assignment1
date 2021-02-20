@@ -75,9 +75,11 @@ public class Collator {
     }
 
     public void addNode(String hostname, int port) throws IOException {
-        this.nodeHosts.add(hostname);
-        this.nodePorts.add(port);
-        this.numConnectedNodes++;
+        synchronized(this) {
+            this.nodeHosts.add(hostname);
+            this.nodePorts.add(port);
+            this.numConnectedNodes++;
+        }
 
         if(this.numConnectedNodes == this.numNodes){
             //send start messages to all nodes

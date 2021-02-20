@@ -23,8 +23,10 @@ public class Node {
     }
 
     public void addReceivedSum(long payload) {
-        this.totalReceivedSum += payload;
-        this.totalReceivedMessages++;
+        synchronized(this) {
+            this.totalReceivedSum = this.totalReceivedSum + payload;
+            this.totalReceivedMessages = this.totalReceivedMessages + 1;
+        }
     }
 
     private void sendMessageToNode(String hostname, int port, MessagePayload message) throws IOException {
@@ -39,6 +41,8 @@ public class Node {
     }
 
     private void sendCollatorDone() throws IOException {
+        System.out.printf("Node: %s %d sending collator done signal\n", this.hostname, this.port);
+
         Socket collatorSocket = new Socket(this.collatorHostname, this.collatorPort);
         DataOutputStream collatorOutput = new DataOutputStream(collatorSocket.getOutputStream());
         MessageDoneSending message = new MessageDoneSending(this.hostname, this.port);
@@ -50,6 +54,8 @@ public class Node {
     }
 
     public void startSendingMessages(MessageStartRounds msg) throws IOException {
+        System.out.printf("Node: %s %d received signal to send messages\n", this.hostname, this.port);
+
         ArrayList<String> nodeHosts = msg.hostnames;
         ArrayList<Integer> nodePorts = msg.ports;
         for (int i = 0; i < msg.numRounds; i++) {
@@ -59,10 +65,12 @@ public class Node {
             int port = nodePorts.get(index);
             for (int j = 0; j < msg.numMessages; j++) {
                 // send msgs to selected node
-                MessagePayload message = new MessagePayload(i, j, randomizer.nextLong(), this.port, this.hostname);
+                long payload = randomizer.nextLong();
+                payload = 1;
+                MessagePayload message = new MessagePayload(i, j, payload, this.port, this.hostname);
                 this.sendMessageToNode(hostname, port, message);
                 this.totalSentMessages++;
-                this.totalSentSum += message.payload;
+                this.totalSentSum += payload;
             }
         }
 
@@ -71,6 +79,8 @@ public class Node {
     }
 
     public void sendSummary() throws IOException {
+        System.out.printf("Node: %s %d sending summary to collator\n", this.hostname, this.port);
+
         String summary = String.format("%s,%d,%d,%d,%d,%d", this.hostname, this.port, this.totalSentMessages, this.totalReceivedMessages, this.totalSentSum, this.totalReceivedSum);
 
         Socket collatorSocket = new Socket(this.collatorHostname, this.collatorPort);
@@ -110,6 +120,8 @@ public class Node {
         outCollator.flush();
         outCollator.close();
         collatorSocket.close();
+
+        System.out.printf("Node: %s %d has registered and waiting for connections\n", this.hostname, this.port);
 
         while(this.running){
             Socket clientSocket;
