@@ -19,7 +19,7 @@
 
 # java -cp hw1-1.0.jar cs455.overlay.Main collator 127.0.0.1 10000 3 50 50 &
 # echo "here"
-PORTS="8500 9000 9500 7000"
+PORTS="8500 9000 9500 7000 7500 10500"
 
 for PORT in ${PORTS} ; do
     java -cp build/libs/hw1-1.0.jar cs455.overlay.Main node 127.0.0.1 ${PORT} 127.0.0.1 10000 &
