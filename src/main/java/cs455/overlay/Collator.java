@@ -66,7 +66,6 @@ public class Collator {
     }
 
     public void addSummary(String summary) throws IOException {
-        System.out.printf("Collator: summary of %s\n", summary);
         synchronized(this.lock){
             this.messageSummaries.add(summary);
         }

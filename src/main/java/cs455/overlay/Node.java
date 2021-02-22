@@ -73,7 +73,6 @@ public class Node {
             for (int j = 0; j < msg.numMessages; j++) {
                 // send msgs to selected node
                 long payload = randomizer.nextLong();
-                payload = 1;
                 MessagePayload message = new MessagePayload(i, j, payload, this.port, this.hostname, port, hostname);
                 this.sendMessageToNode(hostname, port, message);
                 this.totalSentMessages++;
