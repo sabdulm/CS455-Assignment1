@@ -5,13 +5,14 @@ import java.io.*;
 public class MessagePayload {
     public static final int TYPE = 3;
     public int numRound;
-    public int port;
+    public int toPort, fromPort;
     public int numMessage;
-    public String hostname;
+    public String toHostname, fromHostname;
     public long payload;
 
-    public MessagePayload(int numRound, int numMessage, long payload, int port, String hostname){
-        this.hostname = hostname; this.port = port;
+    public MessagePayload(int numRound, int numMessage, long payload, int fp, String fh, int tp, String th){
+        this.fromHostname = fh; this.fromPort = fp;
+        this.toHostname = th; this.toPort = tp;
         this.numRound = numRound; this.numMessage = numMessage; this.payload = payload;
     }
 
@@ -25,8 +26,14 @@ public class MessagePayload {
         int hostNameLength = din.readInt();
         byte[] hostNameBytes = new byte[hostNameLength];
         din.readFully(hostNameBytes);
-        this.hostname = new String(hostNameBytes);
-        this.port = din.readInt();
+        this.fromHostname = new String(hostNameBytes);
+        this.fromPort = din.readInt();
+
+        hostNameLength = din.readInt();
+        hostNameBytes = new byte[hostNameLength];
+        din.readFully(hostNameBytes);
+        this.toHostname = new String(hostNameBytes);
+        this.toPort = din.readInt();
 
         byteArrayInputStream.close();
         din.close();
@@ -42,11 +49,18 @@ public class MessagePayload {
         dout.writeInt(this.numMessage);
         dout.writeLong(this.payload);
 
-        byte[] hostnameBytes = this.hostname.getBytes();
+        byte[] hostnameBytes = this.fromHostname.getBytes();
         int hostnameLength = hostnameBytes.length;
         dout.writeInt(hostnameLength);
         dout.write(hostnameBytes);
-        dout.writeInt(this.port);
+        dout.writeInt(this.fromPort);
+
+        hostnameBytes = this.toHostname.getBytes();
+        hostnameLength = hostnameBytes.length;
+        dout.writeInt(hostnameLength);
+        dout.write(hostnameBytes);
+        dout.writeInt(this.toPort);
+        
 
         dout.flush();
 
@@ -58,8 +72,6 @@ public class MessagePayload {
     }
 
     public void printContents(){
-        System.out.println("printing payload message");
-        System.out.printf("received msg from %s %d\n", this.hostname, this.port);
-        System.out.printf("Round: %d, Message: %d, payload: %d\n", this.numRound, this.numMessage, this.payload);
+        System.out.printf("From %s %d to %s %d\nRound: %d, Message: %d, payload: %d\n", this.fromHostname, this.fromPort, this.toHostname, this.toPort, this.numRound, this.numMessage, this.payload);
     }
 }

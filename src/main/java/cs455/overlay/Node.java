@@ -15,30 +15,42 @@ public class Node {
     private final int collatorPort;
     private boolean running = true;
     private long totalSentMessages, totalReceivedMessages, totalSentSum, totalReceivedSum;
-
+    private final Object lock = new Object();
+    private int totalConnections = 0;
 
     Node(String hn, int p, String chn, int cp){
         this.hostname = hn; this.port = p;
         this.collatorHostname = chn; this.collatorPort = cp;
     }
 
-    public void addReceivedSum(long payload) {
-        this.totalReceivedSum += payload;
-        this.totalReceivedMessages++;
+    public synchronized void addReceivedSum(long payload) {
+        synchronized (this.lock){
+            this.totalReceivedSum = this.totalReceivedSum + payload;
+            this.totalReceivedMessages = this.totalReceivedMessages + 1;
+        }
+
     }
 
     private void sendMessageToNode(String hostname, int port, MessagePayload message) throws IOException {
-        Socket socket = new Socket(hostname, port);
-        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+        try {
+            Socket socket = new Socket(hostname, port);
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+            byte[] marshalledMsg = message.getBytes();
+            outputStream.write(marshalledMsg);
+            outputStream.flush();
+            outputStream.close();
+            socket.close();
 
-        byte[] marshalledMsg = message.getBytes();
-        outputStream.write(marshalledMsg);
-        outputStream.flush();
-        outputStream.close();
-        socket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void sendCollatorDone() throws IOException {
+        // System.out.printf("Node: %s %d sending collator done signal\n", this.hostname, this.port);
+
         Socket collatorSocket = new Socket(this.collatorHostname, this.collatorPort);
         DataOutputStream collatorOutput = new DataOutputStream(collatorSocket.getOutputStream());
         MessageDoneSending message = new MessageDoneSending(this.hostname, this.port);
@@ -50,6 +62,7 @@ public class Node {
     }
 
     public void startSendingMessages(MessageStartRounds msg) throws IOException {
+
         ArrayList<String> nodeHosts = msg.hostnames;
         ArrayList<Integer> nodePorts = msg.ports;
         for (int i = 0; i < msg.numRounds; i++) {
@@ -59,10 +72,11 @@ public class Node {
             int port = nodePorts.get(index);
             for (int j = 0; j < msg.numMessages; j++) {
                 // send msgs to selected node
-                MessagePayload message = new MessagePayload(i, j, randomizer.nextLong(), this.port, this.hostname);
+                long payload = randomizer.nextLong();
+                MessagePayload message = new MessagePayload(i, j, payload, this.port, this.hostname, port, hostname);
                 this.sendMessageToNode(hostname, port, message);
                 this.totalSentMessages++;
-                this.totalSentSum += message.payload;
+                this.totalSentSum += payload;
             }
         }
 
@@ -71,8 +85,11 @@ public class Node {
     }
 
     public void sendSummary() throws IOException {
-        String summary = String.format("%s,%d,%d,%d,%d,%d", this.hostname, this.port, this.totalSentMessages, this.totalReceivedMessages, this.totalSentSum, this.totalReceivedSum);
-
+        // System.out.printf("Node: %s %d sending summary to collator\n", this.hostname, this.port);
+        String summary;
+        synchronized(this.lock) {
+            summary = String.format("%s,%d,%d,%d,%d,%d", this.hostname, this.port, this.totalSentMessages, this.totalReceivedMessages, this.totalSentSum, this.totalReceivedSum);
+        }
         Socket collatorSocket = new Socket(this.collatorHostname, this.collatorPort);
         DataOutputStream collatorOutput = new DataOutputStream(collatorSocket.getOutputStream());
         MessageSummary message = new MessageSummary(summary);
@@ -111,6 +128,8 @@ public class Node {
         outCollator.close();
         collatorSocket.close();
 
+        // System.out.printf("Node: %s %d has registered and waiting for connections\n", this.hostname, this.port);
+
         while(this.running){
             Socket clientSocket;
 
@@ -120,6 +139,7 @@ public class Node {
                 DataOutputStream clientDOS = new DataOutputStream(clientSocket.getOutputStream());
                 Thread clientHandler = new NodeThread(clientSocket, clientDIS, clientDOS, this);
                 clientHandler.start();
+                this.totalConnections++;
 
             } catch (Exception e){
                 e.printStackTrace();

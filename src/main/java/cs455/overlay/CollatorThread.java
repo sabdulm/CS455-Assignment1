@@ -38,7 +38,7 @@ public class CollatorThread extends Thread{
                 // collator receives close signal.
                 this.clientDIS.readAllBytes();
             }
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         } finally {
             try {

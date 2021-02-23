@@ -21,7 +21,6 @@ public class NodeThread extends Thread{
         int type;
         try {
             type = clientDIS.readInt();
-
             if (type == 2) {
                 // collator sends start signal to nodes
                 MessageStartRounds startMsg = new MessageStartRounds(clientDIS.readAllBytes());
@@ -29,9 +28,10 @@ public class NodeThread extends Thread{
             } else if (type == 3) {
                 // message received from other node with payload
                 MessagePayload payloadMsg = new MessagePayload(clientDIS.readAllBytes());
-                synchronized (this.node) {
+                synchronized (this.node){
                     this.node.addReceivedSum(payloadMsg.payload);
                 }
+
             } else if(type == 5) {
                 // collator asks for summary
                 this.node.sendSummary();

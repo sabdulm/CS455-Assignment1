@@ -20,6 +20,7 @@ public class Collator {
     private final int numMessages;
     private boolean running = true;
     private int nodeDoneSending = 0;
+    private final Object lock = new Object();
 
     Collator(String hn, int p, int nn, int nr, int nm){
         this.hostname = hn;
@@ -65,7 +66,9 @@ public class Collator {
     }
 
     public void addSummary(String summary) throws IOException {
-        this.messageSummaries.add(summary);
+        synchronized(this.lock){
+            this.messageSummaries.add(summary);
+        }
 
         if(this.messageSummaries.size() == this.numConnectedNodes) {
             System.out.println("Collator: received all summaries, sending signal to shutdown.");
@@ -75,9 +78,12 @@ public class Collator {
     }
 
     public void addNode(String hostname, int port) throws IOException {
-        this.nodeHosts.add(hostname);
-        this.nodePorts.add(port);
-        this.numConnectedNodes++;
+        System.out.printf("Collator: Node %s %d has registered\n", hostname, port);
+        synchronized(this.lock) {
+            this.nodeHosts.add(hostname);
+            this.nodePorts.add(port);
+            this.numConnectedNodes++;
+        }
 
         if(this.numConnectedNodes == this.numNodes){
             //send start messages to all nodes
@@ -106,11 +112,15 @@ public class Collator {
 
     }
 
-    public void updateDoneSending() throws IOException {
-        this.nodeDoneSending++;
+    public void updateDoneSending() throws IOException, InterruptedException {
+        synchronized(this.lock){
+            this.nodeDoneSending++;
+        }
+        
+        
         if(this.nodeDoneSending == this.numConnectedNodes){
             System.out.println("Collator: all nodes completed their rounds, now asking for summaries");
-
+            Thread.sleep(2000);
             for (int i = 0; i < this.numConnectedNodes; i++) {
                 Socket socket = new Socket(this.nodeHosts.get(i), this.nodePorts.get(i));
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());

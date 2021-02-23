@@ -8,6 +8,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         if (args.length != 6 && args.length != 5) {
             System.out.println("Invalid number of args: \nUsage for collator => java -cp <jarfilepath> <main_class> collator <hostname> <port> <number of nodes> <number of rounds> <messages per round>\nUsage for node => java -cp <jarfilepath> <main_class> node <hostname> <port> <collator_hostname> collator_port\n");
+            return;
         }
 
 
