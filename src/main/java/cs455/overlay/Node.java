@@ -15,7 +15,6 @@ public class Node {
     private final int collatorPort;
     private boolean running = true;
     private long totalSentMessages, totalReceivedMessages, totalSentSum, totalReceivedSum;
-    private final Object lock = new Object();
 
     Node(String hn, int p, String chn, int cp){
         this.hostname = hn; this.port = p;
@@ -23,10 +22,8 @@ public class Node {
     }
 
     public synchronized void addReceivedSum(long payload) {
-        synchronized (this.lock){
-            this.totalReceivedSum = this.totalReceivedSum + payload;
-            this.totalReceivedMessages = this.totalReceivedMessages + 1;
-        }
+        this.totalReceivedSum = this.totalReceivedSum + payload;
+        this.totalReceivedMessages = this.totalReceivedMessages + 1;
 
     }
 
@@ -78,10 +75,8 @@ public class Node {
 
     public void sendSummary() throws IOException {
         // System.out.printf("Node: %s %d sending summary to collator\n", this.hostname, this.port);
-        String summary;
-        synchronized(this.lock) {
-            summary = String.format("%s,%d,%d,%d,%d,%d", this.hostname, this.port, this.totalSentMessages, this.totalReceivedMessages, this.totalSentSum, this.totalReceivedSum);
-        }
+        String summary = String.format("%s,%d,%d,%d,%d,%d", this.hostname, this.port, this.totalSentMessages, this.totalReceivedMessages, this.totalSentSum, this.totalReceivedSum);
+
         Socket collatorSocket = new Socket(this.collatorHostname, this.collatorPort);
         DataOutputStream collatorOutput = new DataOutputStream(collatorSocket.getOutputStream());
         MessageSummary message = new MessageSummary(summary);
