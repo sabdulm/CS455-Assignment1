@@ -1,6 +1,5 @@
+# Sheikh Mannan - sheikh.mannan@colostate.edu
 # CS455-Assignment1
-
-Sheikh Mannan - sheikh.mannan@colostate.edu
 
 ## Pre-Reqs
  
@@ -8,6 +7,7 @@ Sheikh Mannan - sheikh.mannan@colostate.edu
 * ssh
 * scp
 * bash scripting
+* gradle
 
 ## How to run
 
@@ -33,10 +33,12 @@ Sheikh Mannan - sheikh.mannan@colostate.edu
     5. JARFILE_PATH (path to jar on the local machine)
     6. REMOTE_JAR_PATH (directory to keep the jar on the remote machine)
 
-* the script has two functionalities: 
+* the script has the following functionalities with the associated flags: 
     
-    1. It can copy the jar file to your desired directory on the remote machine. To do this pass the -c flag to the script. This uses the scp command.
-    2.  It can run nodes on the list of dept machines that you have specified provided the jar file is present in the path you specify. To do this pass the flag -r
+    1. It can build the jar file from gradle using `-b`
+    2. It can copy the jar file to your desired directory on the remote machine. To do this pass the `-c` flag to the script. This uses the scp command.
+    3.  It can run nodes on the list of dept machines that you have specified provided the jar file is present in the path you specify. To do this pass the flag `-r`.
+    4. It can also clean the local build with the `-f` flag. 
 
     * Note the script will only work for one flag at a time.
 
