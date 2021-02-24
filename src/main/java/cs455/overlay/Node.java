@@ -16,7 +16,6 @@ public class Node {
     private boolean running = true;
     private long totalSentMessages, totalReceivedMessages, totalSentSum, totalReceivedSum;
     private final Object lock = new Object();
-    private int totalConnections = 0;
 
     Node(String hn, int p, String chn, int cp){
         this.hostname = hn; this.port = p;
@@ -32,20 +31,13 @@ public class Node {
     }
 
     private void sendMessageToNode(String hostname, int port, MessagePayload message) throws IOException {
-        try {
             Socket socket = new Socket(hostname, port);
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-            DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             byte[] marshalledMsg = message.getBytes();
             outputStream.write(marshalledMsg);
             outputStream.flush();
             outputStream.close();
             socket.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     private void sendCollatorDone() throws IOException {
@@ -139,7 +131,6 @@ public class Node {
                 DataOutputStream clientDOS = new DataOutputStream(clientSocket.getOutputStream());
                 Thread clientHandler = new NodeThread(clientSocket, clientDIS, clientDOS, this);
                 clientHandler.start();
-                this.totalConnections++;
 
             } catch (Exception e){
                 e.printStackTrace();

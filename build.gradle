@@ -3,4 +3,4 @@ plugins {
 }
 
 group 'sam97.cs455.hw1'
-version '1.0'
+version 'final'

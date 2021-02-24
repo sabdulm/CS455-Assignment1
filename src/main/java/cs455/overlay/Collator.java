@@ -12,9 +12,8 @@ public class Collator {
     final private int port;
     private final ArrayList<String> nodeHosts;
     private final ArrayList<Integer> nodePorts;
-    private ArrayList<String> messageSummaries;
+    private final ArrayList<String> messageSummaries;
     private int numConnectedNodes = 0;
-    private boolean startedMessaging = false;
     private final int numNodes;
     private final int numRounds;
     private final int numMessages;
@@ -90,7 +89,6 @@ public class Collator {
 
             System.out.println("Collator: all nodes joined, sending start signal");
 
-            this.startedMessaging = true;
             for (int i = 0; i < this.numNodes; i++) {
                 ArrayList<String> tempNodes = new ArrayList<>(0);
                 ArrayList<Integer> tempPorts = new ArrayList<>(0);
@@ -138,9 +136,8 @@ public class Collator {
         long totalSentMsgs = 0, totalRecvMsgs = 0;
         long totalSentSum = 0, totalRecvSum = 0;
 
-        for (int i = 0; i < this.messageSummaries.size(); i++) {
-            String msgSummary = this.messageSummaries.get(i);
-            String[] splitSummary =  msgSummary.split(",");
+        for (String msgSummary : this.messageSummaries) {
+            String[] splitSummary = msgSummary.split(",");
             totalSentMsgs += Long.parseLong(splitSummary[2]);
             totalRecvMsgs += Long.parseLong(splitSummary[3]);
             totalSentSum += Long.parseLong(splitSummary[4]);
