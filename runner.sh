@@ -27,7 +27,7 @@ run_jar() {
 }
 
 print_usage() {
-    echo "Usage: sh runner.sh -flag\n-b to build jar\n-c to copy jar to remote\n-r to run jar on remote machines"
+    echo "Usage: sh runner.sh -flag\n-b to build jar\n-c to copy jar to remote\n-r to run jar on remote machines\n-f to run gradle clean locally\n"
 }
 
 clean() {
