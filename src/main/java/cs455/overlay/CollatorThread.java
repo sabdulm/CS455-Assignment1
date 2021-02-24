@@ -20,8 +20,8 @@ public class CollatorThread extends Thread{
     public void run() {
         int type;
         try {
+            // checks the type of message received.
             type = clientDIS.readInt();
-
             if (type == 1){
                 // nodes come and register their ip and port
                 MessageRegister regMsg = new MessageRegister(clientDIS.readAllBytes());

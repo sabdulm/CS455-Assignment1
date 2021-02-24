@@ -20,6 +20,7 @@ public class NodeThread extends Thread{
     public void run() {
         int type;
         try {
+            // checks the type of message received
             type = clientDIS.readInt();
             if (type == 2) {
                 // collator sends start signal to nodes
@@ -28,10 +29,7 @@ public class NodeThread extends Thread{
             } else if (type == 3) {
                 // message received from other node with payload
                 MessagePayload payloadMsg = new MessagePayload(clientDIS.readAllBytes());
-                synchronized (this.node){
-                    this.node.addReceivedSum(payloadMsg.payload);
-                }
-
+                this.node.addReceivedSum(payloadMsg.payload);
             } else if(type == 5) {
                 // collator asks for summary
                 this.node.sendSummary();
@@ -39,6 +37,7 @@ public class NodeThread extends Thread{
                 //collator sends close signal;
                 MessageClose closeMsg = new MessageClose(clientDIS.readAllBytes());
                 if(closeMsg.toClose){
+                    // if in this branch then have to connect to server once more
                     this.node.resendCollatorClose(closeMsg);
                 }
             }
@@ -46,6 +45,7 @@ public class NodeThread extends Thread{
             e.printStackTrace();
         } finally {
             try {
+                // closes the client socket and input output streams
                 clientDIS.close();
                 clientDOS.close();
                 clientSocket.close();
