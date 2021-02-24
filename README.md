@@ -17,13 +17,14 @@
 
 * to run a messaging node
 
-    `java -cp <jar file> cs455.overlay.Main collator <server_hostname> <server_port> <collator_hostname> <collator_port> `
+    `java -cp <jar file> cs455.overlay.Main node <server_hostname> <server_port> <collator_hostname> <collator_port> `
 
 * note that the collator should already be running before you run a messaging node.
 
 ## Runner script for CSU dept machines
 
-* the script for running the messaging nodes on the dept machines is runner.sh
+* the script for running the messaging nodes on the dept machines is `runner.sh`
+* the script also requires ssh keys if you are executing it from an off the network machine
 * Need to change the following variables in the script accordingly:
 
     1. USERNAME
