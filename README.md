@@ -1,4 +1,4 @@
-# Sheikh Mannan - sheikh.mannan@colostate.edu
+# Sheikh Mannan
 # CS455-Assignment1
 
 ## Pre-Reqs
